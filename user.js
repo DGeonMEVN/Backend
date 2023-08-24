@@ -1,7 +1,11 @@
 const mongoose = require("mongoose");
-const Account = new mongoose.Schema({
+const tbl_Account = new mongoose.Schema({
     userId : {type : String, unique : true, required : true},   //type : 문자, unique : 중복불가, required : 필드명 입력해야함
     userPw : { type : String, required : true},
+    userName : { type : String, required : true},
+    gender : {type : Boolean, require : true},
+    regDate : { type : Date, default : Date.now()},
+    updateDate : {type : Date, default: Date.now()}
 });
 
-module.exports = mongoose.model("User", Account);
+module.exports = mongoose.model("MedisonDiary", tbl_Account);
