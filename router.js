@@ -1,3 +1,5 @@
+const bcrypt = require("bcrypt");
+
 module.exports = function(app, User, Board) {
     app.get('/', (req,res) =>{
        res.send("성공");
@@ -6,7 +8,8 @@ module.exports = function(app, User, Board) {
         try {
             const user = new User();
             user.userId = req.body.userId;
-            user.userPw = req.body.userPw;
+            user.userPw = bcrypt.hashSync(req.body.userPw, 10);
+            //bcrypt를 암호를 해독할때 const result = bcrypt.compareSync(입력값, DB에 저장된 값);
             user.userName = req.body.userName;
             user.gender = req.body.gender;
 
