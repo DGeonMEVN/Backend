@@ -7,6 +7,8 @@ module.exports = function(app, User, Board) {
             const user = new User();
             user.userId = req.body.userId;
             user.userPw = req.body.userPw;
+            user.userName = req.body.userName;
+            user.gender = req.body.gender;
 
             await user.save();
             res.json({ message: 'Signup Success!' });
