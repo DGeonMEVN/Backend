@@ -1,5 +1,10 @@
 const bcrypt = require("bcrypt");
-
+const {isNotLoggedIn} = require("./routes/middlewares");
+const {authenticate} = require("passport");
+const express = require('express');
+const cors = require('cors');
+const app = express();
+app.use(cors()); // CORS 허용 설정
 module.exports = function(app, User, Board) {
     app.get('/', (req,res) =>{
        res.send("성공");
@@ -71,14 +76,39 @@ module.exports = function(app, User, Board) {
         }
     });
 
-    app.post('/login', async  function(req,res){
-        try{
-
-        }catch (err){
-            console.error(err);
-            res.json({ message: 'Board failed!!' });
-        }
-    })
+    // app.post('/login', async  function(req,res){
+    //     try{
+    //         res.json({ message: 'login' });
+    //     }catch (err){
+    //         console.error(err);
+    //         res.json({ message: 'Board failed!!' });
+    //     }
+    // })
+    // app.post('/login', isNotLoggedIn, async (req, res, next) => {
+    //     authenticate('local', async (authError, user, info) => {
+    //         if (authError) {
+    //             console.error(authError);
+    //             return next(authError);
+    //         }
+    //
+    //         if (!user) {
+    //             return res.redirect(`/?loginError=${info.message}`);
+    //         }
+    //
+    //         try {
+    //             await req.login(user, async loginError => {
+    //                 if (loginError) {
+    //                     console.error(loginError);
+    //                     return next(loginError);
+    //                 }
+    //                 return res.redirect('/');
+    //             });
+    //         } catch (error) {
+    //             console.error(error);
+    //             return next(error);
+    //         }
+    //     })(req, res, next);
+    // });
 
     app.post('/board/write', async function(req, res) {
         try {
