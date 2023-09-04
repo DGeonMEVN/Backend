@@ -25,6 +25,7 @@
     "passport-local": "^1.0.0",
     "redis": "^4.6.8"
   },
+  "Proxy" : "http://localhost:8080",
   "main": "app.js",
   "keywords": [],
   "author": "",
