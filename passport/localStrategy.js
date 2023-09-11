@@ -12,6 +12,7 @@ module.exports = () => {
                 //* req.body 객체인자 하고 키값이 일치해야 한다.
                 usernameField: 'userId', // req.body.email
                 passwordField: 'userPw', // req.body.password
+
                 /*
                 session: true, // 세션에 저장 여부
                 passReqToCallback: false,
