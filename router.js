@@ -7,7 +7,6 @@ const app = express();
 app.use(cors()); // CORS 허용 설정
 module.exports = function(app, User, Board) {
     app.get('/', (req,res) =>{
-       res.send("성공");
     });
     app.post('/signup', async function(req, res) {
         try {
