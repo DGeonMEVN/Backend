@@ -5,33 +5,36 @@ const { isLoggedIn, isNotLoggedIn } = require('./middlewares'); // 내가 만든
 const User = require('../models/user');
 const router = express.Router();
 
-//* 회원 가입
+// * 회원 가입
 // 사용자 미들웨어 isNotLoggedIn을 통과해야 async (req, res, next) => 미들웨어 실행
-// router.post('/join', isNotLoggedIn, async (req, res, next) => {
-//     const { userId, userPw, userName, gender } = req.body; // 프론트에서 보낸 폼데이터를 받는다.
-//
-//     try {
-//         // 기존에 이메일로 가입한 사람이 있나 검사 (중복 가입 방지)
-//         const exUser = await User.findOne({ where: { email } });
-//         if (exUser) {
-//             return res.redirect('/join?error=exist'); // 에러페이지로 바로 리다이렉트
-//         }
-//
-//         // 정상적인 회원가입 절차면 해시화
-//         const hash = await bcrypt.hash(password, 12);
-//
-//         // DB에 해당 회원정보 생성
-//         await User.create({
-//             email,
-//             password: hash, // 비밀번호에 해시문자를 넣어준다.
-//         });
-//
-//         return res.redirect('/');
-//     } catch (error) {
-//         console.error(error);
-//         return next(error);
-//     }
-// });
+router.post('/join', isNotLoggedIn, async (req, res, next) => {
+    console.log("조인")
+    const { userId, userPw, userName, gender } = req.body; // 프론트에서 보낸 폼데이터를 받는다.
+
+    try {
+        // 기존에 이메일로 가입한 사람이 있나 검사 (중복 가입 방지)
+        const exUser = await User.findOne({ where: { userId } });
+        if (exUser) {
+            return res.redirect('/join?error=exist'); // 에러페이지로 바로 리다이렉트
+        }
+
+        // 정상적인 회원가입 절차면 해시화
+        const hash = await bcrypt.hash(userPw, 12);
+
+        // DB에 해당 회원정보 생성
+        await User.create({
+            userId,
+            userPw: hash, // 비밀번호에 해시문자를 넣어준다.
+            userName,
+            gender,
+        });
+
+        return res.redirect('/');
+    } catch (error) {
+        console.error(error);
+        return next(error);
+    }
+});
 
 
 /* **************************************************************************************** */
@@ -77,12 +80,23 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
 
 
 //* 로그아웃 (isLoggedIn 상태일 경우)
-router.get('/logout', isLoggedIn, (req, res) => {
-    // req.user (사용자 정보가 안에 들어있다. 당연히 로그인되어있으니 로그아웃하려는 거니까)
-    req.logout();
-    req.session.destroy(); // 로그인인증 수단으로 사용한 세션쿠키를 지우고 파괴한다. 세션쿠키가 없다는 말은 즉 로그아웃 인 말.
-    res.redirect('/');
-    console.log("로그아웃")
+// router.get('/logout', isLoggedIn, (req, res) => {
+//     // req.user (사용자 정보가 안에 들어있다. 당연히 로그인되어있으니 로그아웃하려는 거니까)
+//     req.logout();
+//     req.session.destroy(); // 로그인인증 수단으로 사용한 세션쿠키를 지우고 파괴한다. 세션쿠키가 없다는 말은 즉 로그아웃 인 말.
+//     res.redirect('/');
+//     console.log("로그아웃")
+// });
+
+router.get('/logout', (req, res, next) => {
+    req.logOut(err => {
+        if (err) {
+            return next(err);
+        } else {
+            console.log('로그아웃됨.');
+            res.redirect('/');
+        }
+    });
 });
 
 module.exports = router;
