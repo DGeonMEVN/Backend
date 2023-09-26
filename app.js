@@ -70,7 +70,8 @@ const port = 8080;
 passportConfig();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-cors();
+// cors();
+app.use(cors());
 const User = require('./models/user');
 const router = require('./router')(app,User)
 const cookieParser = require("cookie-parser");
@@ -91,6 +92,12 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    next();
+});
 
 app.use('/auth', require('./routes/auth'));
 
