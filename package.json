@@ -23,9 +23,10 @@
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
-    "redis": "^4.6.8"
+    "redis": "^4.6.8",
+    "uuid": "^9.0.0"
   },
-  "Proxy" : "http://localhost:8080",
+  "Proxy": "http://localhost:8080",
   "main": "app.js",
   "keywords": [],
   "author": "",
