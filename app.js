@@ -68,12 +68,11 @@ const passportConfig = require('./passport');
 // const authRouter = require('./routes/auth'); // 인증 라우터
 const port = 8080;
 passportConfig();
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 // cors();
 app.use(cors());
 const User = require('./models/user');
-const router = require('./router')(app,User)
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 
@@ -99,7 +98,7 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use('/auth', require('./routes/auth'));
+app.use('/api/auth', require('./routes/auth'));
 
 app.listen(port, function(){
     console.log("Success Port : " + port)
