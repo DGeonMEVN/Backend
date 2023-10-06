@@ -13,7 +13,6 @@ module.exports = () => {
     //? req.login(user, ...) 가 실행되면, serializeUser가 실행된다.
     //? 즉 로그인 과정을 할때만 실행
     passport.serializeUser((user, done) => {
-        console.log("시리얼라이즈")
         // req.login(user, ...)의 user가 일로 와서 값을 이용할수 있는 것이다.
         done(null, user.userId);
         // req.session객체에 어떤 데이터를 저장할 지 선택.
@@ -25,8 +24,6 @@ module.exports = () => {
     //? deserializeUser는 serializeUser()가 done하거나 passport.session()이 실행되면 실행된다.
     //? 즉, 서버 요청이 올때마다 항상 실행하여 로그인 유저 정보를 불러와 이용한다.
     passport.deserializeUser((userId, done) => {
-        console.log("디시리얼라이즈",userId)
-
         // req.session에 저장된 사용자 아이디를 바탕으로 DB 조회로 사용자 정보를 얻어낸 후 req.user에 저장.
         // 즉, id를 sql로 조회해서 전체 정보를 가져오는 복구 로직이다.
         User.findOne({ userId : userId} )
