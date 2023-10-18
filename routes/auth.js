@@ -6,6 +6,7 @@ const User = require('../models/user');
 const router = express.Router();
 const jwt = require('../utils/jwt-util');
 const redisClient = require('../utils/redisUtil');
+const refresh = require("../utils/refresh");
 
 // * 회원 가입
 // 사용자 미들웨어 isNotLoggedIn을 통과해야 async (req, res, next) => 미들웨어 실행
@@ -60,7 +61,7 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
         }
 
 
-        return req.login(user, loginError => {
+        return req.login(user, { session : false },(loginError) => {
             if(loginError) {
                 console.error(loginError);
                 return next(loginError);
@@ -112,6 +113,7 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
  * @description logout으로 로그인이 된(isLoggedIn) 상태에서만 접근이 가능하다
  */
 router.post('/logout', isLoggedIn,(req, res, next) => {
+    console.log("로그아웃 호출")
     req.logout((err) => {
         if(err)  {
             console.log(err)
@@ -168,5 +170,7 @@ router.post('/signup', isNotLoggedIn, async (req,res,next)=>{
         res.json({ message: 'Signup failed!!' });
     }
 })
+
+router.get('/refresh', refresh);
 
 module.exports = router;
