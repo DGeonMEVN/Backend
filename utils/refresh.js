@@ -49,7 +49,7 @@ const refresh = async (req, res) => {
             // 3. access token이 만료되지 않은경우 => refresh 할 필요가 없습니다.
             res.status(400).send({
                 ok: false,
-                message: 'Acess token is not expired!',
+                message: 'Access token is not expired!',
             });
         }
     } else { // access token 또는 refresh token이 헤더에 없는 경우
