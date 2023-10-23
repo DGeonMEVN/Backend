@@ -8,11 +8,12 @@ module.exports = {
     sign: (user) => { // access token 발급
         const payload = { // access token에 들어갈 payload
             userId : user.userId,
+            // exp : '1h'
         };
 
         return jwt.sign(payload, secret, { // secret으로 sign하여 발급하고 return
             algorithm: 'HS256', // 암호화 알고리즘
-            expiresIn: '60s', 	  // 유효기간
+            expiresIn: '1h', 	  // 유효기간
         });
     },
     verify: (token) => { // access token 검증

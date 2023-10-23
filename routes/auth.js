@@ -6,6 +6,7 @@ const User = require('../models/user');
 const router = express.Router();
 const jwt = require('../utils/jwt-util');
 const redisClient = require('../utils/redisUtil');
+const refresh = require("../utils/refresh");
 
 // * 회원 가입
 // 사용자 미들웨어 isNotLoggedIn을 통과해야 async (req, res, next) => 미들웨어 실행
@@ -60,7 +61,7 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
         }
 
 
-        return req.login(user, loginError => {
+        return req.login(user, { session : false },(loginError) => {
             if(loginError) {
                 console.error(loginError);
                 return next(loginError);
@@ -73,6 +74,7 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
 
                 // 발급한 refresh token을 redis에 key를 user의 id로 하여 저장합니다.
                 redisClient.set(user.id, refreshToken);
+                redisClient.expire(user.id, 60); //Token 유효기간
 
                 res.status(200).json({ // client에게 토큰 모두를 반환합니다.
                     ok: true,
@@ -112,6 +114,7 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
  * @description logout으로 로그인이 된(isLoggedIn) 상태에서만 접근이 가능하다
  */
 router.post('/logout', isLoggedIn,(req, res, next) => {
+    console.log("로그아웃 호출")
     req.logout((err) => {
         if(err)  {
             console.log(err)
@@ -168,5 +171,14 @@ router.post('/signup', isNotLoggedIn, async (req,res,next)=>{
         res.json({ message: 'Signup failed!!' });
     }
 })
+
+router.get('/refresh', refresh, async (req,res,next) =>{
+    try{
+        console.log("뭔데");
+    }catch (err){
+        console.error(err);
+        res.json({ message: 'Signup failed!!' });
+    }
+});
 
 module.exports = router;
