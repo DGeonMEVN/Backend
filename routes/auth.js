@@ -74,6 +74,7 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
 
                 // 발급한 refresh token을 redis에 key를 user의 id로 하여 저장합니다.
                 redisClient.set(user.id, refreshToken);
+                redisClient.expire(user.id, 60); //Token 유효기간
 
                 res.status(200).json({ // client에게 토큰 모두를 반환합니다.
                     ok: true,
@@ -171,6 +172,13 @@ router.post('/signup', isNotLoggedIn, async (req,res,next)=>{
     }
 })
 
-router.get('/refresh', refresh);
+router.get('/refresh', refresh, async (req,res,next) =>{
+    try{
+        console.log("뭔데");
+    }catch (err){
+        console.error(err);
+        res.json({ message: 'Signup failed!!' });
+    }
+});
 
 module.exports = router;
