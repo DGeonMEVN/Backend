@@ -73,8 +73,8 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
                 const refreshToken = jwt.refresh();
 
                 // 발급한 refresh token을 redis에 key를 user의 id로 하여 저장합니다.
-                redisClient.set(user.id, refreshToken);
-                redisClient.expire(user.id, 60); //Token 유효기간
+                redisClient.set(user.userId, refreshToken);
+                redisClient.expire(user.userId, 60*60*24*7); //Token 유효기간
 
                 res.status(200).json({ // client에게 토큰 모두를 반환합니다.
                     ok: true,
@@ -113,18 +113,28 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
  * @data 2023-10-06
  * @description logout으로 로그인이 된(isLoggedIn) 상태에서만 접근이 가능하다
  */
-router.post('/logout', isLoggedIn,(req, res, next) => {
+router.post('/logout', (req, res, next) => {
     console.log("로그아웃 호출")
-    req.logout((err) => {
-        if(err)  {
-            console.log(err)
-            return next(err)
-        }
-        res.clearCookie('connect.sid', {httpOnly: true})
-        req.session.destroy();
-        // res.redirect('/');
-        res.status(200).send({message: '성공!'});
-    })
+    //세션일때 동작
+    // req.logout((err) => {
+    //     if(err)  {
+    //         console.log(err)
+    //         return next(err)
+    //     }
+    //     // res.clearCookie('connect.sid', {httpOnly: true})
+    //     // req.session.destroy();
+    //     // res.redirect('/');
+    //     redisClient.del('1234');
+    //     res.status(200).send({message: '성공!'});
+    // })
+    try{
+        const authorizationHeader = req.headers['authorization'];
+        console.log(authorizationHeader);
+        // redisClient.del('1234')
+        res.status(200).send({message:'Success'});
+    }catch (err){
+        console.log(err);
+    }
 });
 
 /**
