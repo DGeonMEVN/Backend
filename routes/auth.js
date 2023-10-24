@@ -4,6 +4,9 @@ const bcrypt = require('bcrypt');
 const { isLoggedIn, isNotLoggedIn } = require('./middlewares'); // 내가 만든 사용자 미들웨어
 const User = require('../models/user');
 const router = express.Router();
+const jwt = require('../utils/jwt-util');
+const redisClient = require('../utils/redisUtil');
+const refresh = require("../utils/refresh");
 
 // * 회원 가입
 // 사용자 미들웨어 isNotLoggedIn을 통과해야 async (req, res, next) => 미들웨어 실행
@@ -56,12 +59,38 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
         if(!user) {
             return res.redirect(`/auth/?loginError=${info.message}`);
         }
-        return req.login(user, loginError => {
+
+
+        return req.login(user, { session : false },(loginError) => {
             if(loginError) {
                 console.error(loginError);
                 return next(loginError);
             }
-            return res.send(user);
+
+            if (user) { // id, pw가 맞다면..
+                // access token과 refresh token을 발급합니다.
+                const accessToken = jwt.sign(user);
+                const refreshToken = jwt.refresh();
+
+                // 발급한 refresh token을 redis에 key를 user의 id로 하여 저장합니다.
+                redisClient.set(user.userId, refreshToken);
+                redisClient.expire(user.userId, 60*60*24*7); //Token 유효기간
+
+                res.status(200).json({ // client에게 토큰 모두를 반환합니다.
+                    ok: true,
+                    data: {
+                        accessToken,
+                        refreshToken,
+                    },
+                });
+            } else {
+                res.status(401).send({
+                    ok: false,
+                    message: 'password is incorrect',
+                });
+            }
+
+            // return res.send(user);
             // return res.redirect('/');
         });
     })(req, res, next);
@@ -84,17 +113,28 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
  * @data 2023-10-06
  * @description logout으로 로그인이 된(isLoggedIn) 상태에서만 접근이 가능하다
  */
-router.post('/logout', isLoggedIn,(req, res, next) => {
-    req.logout((err) => {
-        if(err)  {
-            console.log(err)
-            return next(err)
-        }
-        res.clearCookie('connect.sid', {httpOnly: true})
-        req.session.destroy();
-        // res.redirect('/');
-        res.status(200).send({message: '성공!'});
-    })
+router.post('/logout', (req, res, next) => {
+    console.log("로그아웃 호출")
+    //세션일때 동작
+    // req.logout((err) => {
+    //     if(err)  {
+    //         console.log(err)
+    //         return next(err)
+    //     }
+    //     // res.clearCookie('connect.sid', {httpOnly: true})
+    //     // req.session.destroy();
+    //     // res.redirect('/');
+    //     redisClient.del('1234');
+    //     res.status(200).send({message: '성공!'});
+    // })
+    try{
+        const authorizationHeader = req.headers['authorization'];
+        console.log(authorizationHeader);
+        // redisClient.del('1234')
+        res.status(200).send({message:'Success'});
+    }catch (err){
+        console.log(err);
+    }
 });
 
 /**
@@ -141,5 +181,14 @@ router.post('/signup', isNotLoggedIn, async (req,res,next)=>{
         res.json({ message: 'Signup failed!!' });
     }
 })
+
+router.get('/refresh', refresh, async (req,res,next) =>{
+    try{
+        console.log("뭔데");
+    }catch (err){
+        console.error(err);
+        res.json({ message: 'Signup failed!!' });
+    }
+});
 
 module.exports = router;
