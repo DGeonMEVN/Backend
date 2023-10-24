@@ -17,20 +17,20 @@ const User = require('./models/user');
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 
-app.use(cookieParser(process.env.COOKIE_SECRET));
-app.use(
-    session({
-        resave: false,
-        saveUninitialized: false,
-        secret: process.env.COOKIE_SECRET,
-        cookie: {
-            httpOnly: true,
-            secure: false,
-        },
-    }),
-);
+// app.use(cookieParser(process.env.COOKIE_SECRET));
+// app.use(
+//     session({
+//         resave: false,
+//         saveUninitialized: false,
+//         secret: process.env.COOKIE_SECRET,
+//         cookie: {
+//             httpOnly: true,
+//             secure: false,
+//         },
+//     }),
+// );
 app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.session());
 
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
@@ -49,7 +49,7 @@ mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTop
 const db = mongoose.connection;
 db.on('error', console.error);
 db.once('open', function(){
-    console.log("Connection Success");
+    console.log("Mongoose Connected");
 });
 
 
