@@ -9,8 +9,9 @@ const redisClient = require('../utils/redisUtil');
 const refresh = require("../utils/refresh");
 const authJWT = require('../utils/authJWT')
 const jsonwebtoken = require('jsonwebtoken');
-
+const {getProfile} = require('../user/profile');
 // * 회원 가입
+
 // 사용자 미들웨어 isNotLoggedIn을 통과해야 async (req, res, next) => 미들웨어 실행
 /**
  * @author ovmkas
@@ -191,6 +192,6 @@ router.post('/signup', isNotLoggedIn, async (req,res,next)=>{
 
 router.post('/refresh', refresh);
 
-router.get('/profile', authJWT, viewProfile);
+router.get('/profile', authJWT, getProfile);
 
 module.exports = router;
