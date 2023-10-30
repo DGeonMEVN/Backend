@@ -190,7 +190,7 @@ router.post('/signup', isNotLoggedIn, async (req,res,next)=>{
     }
 })
 
-router.post('/refresh', refresh);
+router.get('/refresh', refresh);
 
 router.get('/profile', authJWT, getProfile);
 
