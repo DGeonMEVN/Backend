@@ -2,6 +2,9 @@ const { sign, verify, refreshVerify } = require('./jwt-util');
 const jwt = require('jsonwebtoken');
 
 const refresh = async (req, res) => {
+    console.log("refresh.js 호출")
+    console.log("refresh.js authorization = ", req.headers.authorization)
+    console.log("refresh.js refresh =", req.headers.refresh)
     // access token과 refresh token의 존재 유무를 체크합니다.
     /* vuex의 access, refresh token 값을 받아와 확인 */
     // authorization = accessToken / refresh = refreshToken
@@ -36,17 +39,18 @@ const refresh = async (req, res) => {
             // 1. access token이 만료되고, refresh token도 만료 된 경우 => 새로 로그인해야합니다.
             if (!refreshResult) {
                 console.log('refresh.js 통과 됐니?')
-                res.json({
+                res.status(401).json({
                     ok: false,
                     message: 'No authorized!',
                 });
             } else {
                 // 2. access token이 만료되고, refresh token은 만료되지 않은 경우 => 새로운 access token을 발급
-                const member = {
+                console.log("refresh.js accessToken 없고 refreshToken만 있음")
+                const user = {
                     userId: decoded.userId,
                 }
-                console.log('refresh.js member = ', member)
-                const newAccessToken = sign(member);
+                console.log('refresh.js member = ', user)
+                const newAccessToken = sign(user);
                 console.log('refresh.js newAccessToken = ', newAccessToken)
 
                 res.status(200).json({ // 새로 발급한 access token과 원래 있던 refresh token 모두 클라이언트에게 반환합니다.
