@@ -74,7 +74,7 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
                 // access token과 refresh token을 발급합니다.
                 const accessToken = `Bearer ` + jwt.sign(user);
                 const refreshToken = jwt.refresh();
-
+                const userId = user.userId;
                 // 발급한 refresh token을 redis에 key를 user의 id로 하여 저장합니다.
                 redisClient.set(user.userId, refreshToken);
                 redisClient.expire(user.userId, 180 ); //Token 유효기간60*60*24*7
@@ -84,6 +84,7 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
                     data: {
                         accessToken,
                         refreshToken,
+                        userId,
                     },
                 });
             } else {
@@ -138,7 +139,7 @@ router.post('/logout', (req, res, next) => {
             redisClient.del(decoded.userId);
             res.status(200).send({message: 'Success'});
         }else{
-            res.status(200).send();
+            res.status(401).send();
         }
     }catch (err){
         console.log(err);
