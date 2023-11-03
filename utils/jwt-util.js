@@ -3,7 +3,11 @@ const jwt = require('jsonwebtoken');
 const redisClient = require('./redisUtil');
 const secret = process.env.SECRET;
 
-
+/**
+ * @author ovmkas
+ * @data 2023-10-30
+ * @description Jwt 생성 및 검증
+ */
 module.exports = {
     sign: (user) => { // access token 발급
         const payload = { // access token에 들어갈 payload
@@ -13,7 +17,7 @@ module.exports = {
 
         return jwt.sign(payload, secret, { // secret으로 sign하여 발급하고 return
             algorithm: 'HS256', // 암호화 알고리즘
-            expiresIn: '20s', 	  // 유효기간
+            expiresIn: '30s', 	  // 유효기간
         });
     },
     verify: (token) => { // access token 검증
