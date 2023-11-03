@@ -1,6 +1,12 @@
 const { sign, verify, refreshVerify } = require('./jwt-util');
 const jwt = require('jsonwebtoken');
 
+/**
+ * @author ovmkas
+ * @data 2023-10-30
+ * @description 권한이 있는 페이지 접근시 aToken rToken을 새로 발급 해준다
+ * @return Token 전달
+ */
 const refresh = async (req, res) => {
     console.log("refresh.js 호출")
     console.log("refresh.js authorization = ", req.headers.authorization)
