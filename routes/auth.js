@@ -9,7 +9,7 @@ const redisClient = require('../utils/redisUtil');
 const refresh = require("../utils/refresh");
 const authJWT = require('../utils/authJWT')
 const jsonwebtoken = require('jsonwebtoken');
-const {getProfile} = require('../user/profile');
+const {getProfile, modifyProfile, passwordCheck, deleteUser} = require('../user/profile');
 // * 회원 가입
 
 // 사용자 미들웨어 isNotLoggedIn을 통과해야 async (req, res, next) => 미들웨어 실행
@@ -117,7 +117,7 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
  * @data 2023-10-06
  * @description logout으로 로그인이 된(isLoggedIn) 상태에서만 접근이 가능하다
  */
-router.post('/logout', (req, res, next) => {
+router.post('/logout', (req, res) => {
     console.log("로그아웃 호출")
     //세션일때 동작
     // req.logout((err) => {
@@ -152,9 +152,8 @@ router.post('/logout', (req, res, next) => {
  * @description 회원 가입 시 ID를 중복 체크해준다 중복된다면 true를 반환하고 중복이 아니면 false를 반환한다
  * @return checkId
  */
-router.post('/idcheck', isNotLoggedIn, async (req,res,next)=>{
+router.post('/idcheck', isNotLoggedIn, async (req,res)=>{
     const check = await User.findOne({userId: req.body.userId});
-    const checkId = true;
     if(check){
         res.status(200).json({
             checkId: true
@@ -174,7 +173,7 @@ router.post('/idcheck', isNotLoggedIn, async (req,res,next)=>{
  * @description 회원가입 해주는 함수로써 로그인되지 않은 상태에서 접근이 가능하고 회원가입시 비밀번호를 bcrypt를 설정해준다 DB에 저장된다
  * @return checkId
  */
-router.post('/signup', isNotLoggedIn, async (req,res,next)=>{
+router.post('/signup', isNotLoggedIn, async (req,res)=>{
     try{
         const user = new User();
         user.userId = req.body.userId;
@@ -194,5 +193,11 @@ router.post('/signup', isNotLoggedIn, async (req,res,next)=>{
 router.get('/refresh', refresh);
 
 router.get('/profile', authJWT, getProfile);
+
+router.put('/modify', authJWT, modifyProfile);
+
+router.post('/passwordCheck', passwordCheck);
+
+router.post('/deleteUser', authJWT, deleteUser);
 
 module.exports = router;
