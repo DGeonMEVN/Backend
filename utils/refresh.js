@@ -58,12 +58,13 @@ const refresh = async (req, res) => {
                 console.log('refresh.js member = ', user)
                 const newAccessToken = sign(user);
                 console.log('refresh.js newAccessToken = ', newAccessToken)
-
+                console.log("아이디는 = ",user.userId )
                 res.status(200).json({ // 새로 발급한 access token과 원래 있던 refresh token 모두 클라이언트에게 반환합니다.
                     ok: true,
                     data: {
                         accessToken: `Bearer ${newAccessToken}`,
                         refreshToken,
+                        userId : user.userId,
                     },
                 });
             }
