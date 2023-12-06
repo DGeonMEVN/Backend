@@ -13,9 +13,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 // cors();
 app.use(cors());
-const User = require('./models/user');
-const cookieParser = require("cookie-parser");
-const session = require("express-session");
+// const User = require('./models/user');
+// const cookieParser = require("cookie-parser");
+// const session = require("express-session");
 
 // app.use(cookieParser(process.env.COOKIE_SECRET));
 // app.use(
@@ -40,6 +40,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/noticeBoard', require('./routes/noticeBoard'));
 
 app.listen(port, function(){
     console.log("Success Port : " + port)
