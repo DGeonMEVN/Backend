@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const tbl_Account = new mongoose.Schema({
+const tbl_User = new mongoose.Schema({
     userId : {type : String, unique : true, required : true},   //type : 문자, unique : 중복불가, required : 필드명 입력해야함
     userPw : { type : String, required : true},
     userName : { type : String, required : true},
@@ -8,4 +8,4 @@ const tbl_Account = new mongoose.Schema({
     updateDate : {type : Date, default: Date.now()}
 });
 
-module.exports = mongoose.model("MedisonDiary", tbl_Account);
+module.exports = mongoose.model("MedisonDiaryUser", tbl_User, "MedisonDiary_User");
