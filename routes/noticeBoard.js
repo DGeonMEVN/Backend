@@ -3,6 +3,9 @@ const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
 const router = express.Router();
 const NoticeBoard = require('../models/NoticeBoard');
 const { Counters } = require('../models/Counters');
+const Board = require("../models/NoticeBoard");
+const authJWT = require("../utils/authJWT");
+const User = require("../models/user");
 
 const initializeSequence = async (sequenceName) => {
     try {
@@ -49,7 +52,6 @@ router.post("/white", async (req, res, next) => {
         await board.save();
         res.status(200).send({ ok: true });
     } catch (err) {
-        console.error('Error in post /white:', err);
         console.error('Error stack:', err.stack); // 에러 스택 출력 추가
         res.status(400).send({ ok: false, error: err.message });
     }
@@ -58,7 +60,7 @@ router.post("/white", async (req, res, next) => {
 router.get('/', async (req,res,next)=>{
     try{
         console.log("리스트 요청")
-        const boards = await NoticeBoard.find({});
+        const boards = await NoticeBoard.find({}).sort({"bno" : -1});
         res.json(boards);
     } catch (err) {
         console.error(err);
@@ -69,10 +71,44 @@ router.get('/', async (req,res,next)=>{
 router.get("/noticeView/:bno", async (req,res,next)=>{
     try {
         console.log(req.params.bno);
+        const Board = await NoticeBoard.findOne({bno : req.params.bno})
+        console.log(Board)
+        res.status(200).json({ ok : true, Board : Board});
     }
     catch (err){
-
+        res.status(400).json({ok:false, message : "failed!!"})
     }
 })
+
+router.get("/noticeUpdate/:bno", async (req,res,next)=>{
+    try {
+        console.log(req.params.bno);
+        const Board = await NoticeBoard.findOne({bno : req.params.bno})
+        console.log(Board)
+        res.status(200).json({ ok : true, Board : Board});
+    }
+    catch (err){
+        res.status(400).json({ok:false, message : "failed!!"})
+    }
+})
+
+router.put("/update", async (req, res, next) => {
+    try {
+        await Board.updateOne(
+            {bno : req.body.bno},
+            {
+                $set:
+                    {
+                        title : req.body.title,
+                        content : req.body.content,
+                        updateDate: Date.now()
+                    }
+            })
+        res.status(200).send({ ok: true });
+    } catch (err) {
+        console.error('Error stack:', err.stack); // 에러 스택 출력 추가
+        res.status(400).send({ ok: false, error: err.message });
+    }
+});
 
 module.exports = router;
