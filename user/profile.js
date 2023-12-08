@@ -114,18 +114,18 @@ const deleteUser = async(req, res) =>{
         const user = await User.findOne({userId: req.body.userId});
         if (user && bcrypt.compareSync(req.body.userPw, user.userPw)) {
             await User.deleteOne({userId : req.body.userId});
-            res.status(200).json({
+            res.status(200).send({
                 ok:true,
                 message : "회원이 맞습니다",
             })
         }else{
-            res.status(401).json({
+            res.status(401).send({
                 ok:false,
                 message : "회원이 없거나 회원정보가 다릅니다",
             })
         }
     }catch (err){
-        res.status(401).json({
+        res.status(401).send({
             ok:false,
             message : "회원이 없거나 회원정보가 다릅니다",
         })
