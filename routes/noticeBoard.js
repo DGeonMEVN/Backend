@@ -111,4 +111,21 @@ router.put("/update", async (req, res, next) => {
     }
 });
 
+router.delete("/delete", async (req, res, next) => {
+    try {
+        const user = await User.findOne({userId : req.body.userId})
+        const board = await Board.findOne( { bno : req.body.bno});
+        if(user.userId === board.userId){
+            await board.deleteOne({bno : board.bno});
+            res.status(200).send({ ok: true });
+        }else{
+            res.status(400).send({ ok: false });
+        }
+
+    } catch (err) {
+        console.error('Error stack:', err.stack); // 에러 스택 출력 추가
+        res.status(400).send({ ok: false, error: err.message });
+    }
+});
+
 module.exports = router;
