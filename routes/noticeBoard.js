@@ -57,16 +57,26 @@ router.post("/white", async (req, res, next) => {
     }
 });
 
-router.get('/', async (req,res,next)=>{
+router.get('/:pageNum', async (req,res,next)=>{
     try{
         console.log("리스트 요청")
-        const boards = await NoticeBoard.find({}).sort({"bno" : -1});
-        res.json(boards);
+        const pageNum = req.params.pageNum || 1;
+        const pageSize = 3;
+        const mongoSkip = (pageNum - 1) * pageSize;
+
+        const boards = await NoticeBoard.find({})
+            .sort({"bno" : -1})
+            .skip(mongoSkip)
+            .limit(pageSize);
+        const boardCount = await NoticeBoard.count();
+        const pageCount = boardCount/pageSize;
+        res.status(200).send({ ok : true, boards : boards, pageCount : pageCount });
     } catch (err) {
         console.error(err);
         res.status(500).send({ error: 'Internal Server Error' });
     }
 });
+
 
 router.get("/noticeView/:bno", async (req,res,next)=>{
     try {
