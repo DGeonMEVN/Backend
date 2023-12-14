@@ -40,7 +40,7 @@ const getNextSequenceValue = async (sequenceName) => {
     }
 };
 
-router.post("/white", async (req, res, next) => {
+router.post("/white", authJWT, async (req, res, next) => {
     try {
         await initializeSequence('MedisonDiaryBoard'); // 시퀀스 초기화
         const sequenceValue = await getNextSequenceValue('MedisonDiaryBoard');
@@ -137,5 +137,50 @@ router.delete("/delete", async (req, res, next) => {
         res.status(400).send({ ok: false, error: err.message });
     }
 });
+
+router.post("/search", async (req, res, next) => {
+    try {
+        console.log("search 넘어온 데이터 " , req.body);
+        let pageNum = req.body.pageNum || 1;
+        let pageSize = 3;
+        let mongoSkip = (pageNum - 1) * pageSize;
+
+        let keyword = req.body.search;
+        let query = {};
+        const orConditions = [];
+
+        if (req.body.titleCheck) {
+            orConditions.push({ title: { $regex: new RegExp(keyword, "i") } });
+        }
+        if (req.body.contentCheck) {
+            orConditions.push({ content: { $regex: new RegExp(keyword, "i") } });
+        }
+        if (req.body.userCheck) {
+            orConditions.push({ userId: { $regex: new RegExp(keyword, "i") } });
+        }
+        if (orConditions.length > 0) {
+            query.$or = orConditions;
+        }
+        console.log("query", query)
+        let boards = await NoticeBoard.find(query)
+            .sort({"bno" : -1})
+            .skip(mongoSkip)
+            .limit(pageSize);
+        let boardCount = await NoticeBoard.count(query);
+        let pageCount = Math.round(boardCount/pageSize);
+        if(pageCount===0){
+            pageCount=1;
+        }
+        console.log("boardCount", boardCount)
+        console.log("pageSize", pageSize)
+        console.log("pageCount", pageCount)
+        res.status(200).send({ ok : true, boards : boards, pageCount : pageCount });
+
+    } catch (err) {
+        console.error('Error stack:', err.stack); // 에러 스택 출력 추가
+        res.status(400).send({ ok: false, error: err.message });
+    }
+});
+
 
 module.exports = router;
