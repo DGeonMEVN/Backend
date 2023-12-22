@@ -196,7 +196,7 @@ router.get('/profile', authJWT, getProfile);
 
 router.put('/modify', authJWT, modifyProfile);
 
-router.post('/passwordCheck', passwordCheck);
+router.post('/passwordCheck', authJWT, passwordCheck);
 
 router.post('/deleteUser', authJWT, deleteUser);
 
