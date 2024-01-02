@@ -1,5 +1,11 @@
 const { verify } = require('./jwt-util');
 
+
+/**
+ * @author ovmkas
+ * @created  2023-10-11
+ * @description Token검증을 위한 컴포넌트
+ */
 const authJWT = (req, res, next) => {
     // console.log("authJWT req.headers.authorization = " , req.headers.authorization);
     if (req.headers.authorization) {

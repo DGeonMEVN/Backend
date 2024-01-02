@@ -190,14 +190,42 @@ router.post('/signup', isNotLoggedIn, async (req,res)=>{
     }
 })
 
+/**
+ * @author ovmkas
+ * @data 2023-10-30
+ * @description Token 재발급을 위함 API
+ */
 router.get('/refresh', refresh);
 
+/**
+ * @author ovmkas
+ * @data 2023-10-27
+ * @description '내 정보'를 들어가기 위한 API 및 Token 검증작업
+ */
 router.get('/profile', authJWT, getProfile);
 
+/**
+ * @author ovmkas
+ * @data 2023-11-03
+ * @description 내정보 수정을 위한 API 및 Token 검증
+ */
 router.put('/modify', authJWT, modifyProfile);
 
+
+/**
+ * @author ovmkas
+ * @created  2023-10-27
+ * @description '내 정보'를 들어가기 위한 API
+ * @modified 2023-12-22
+ * @modification Token 검증 작업 추가
+ */
 router.post('/passwordCheck', authJWT, passwordCheck);
 
+/**
+ * @author ovmkas
+ * @created  2023-11-03
+ * @description 회원탈퇴 및 Token 검증 작업
+ */
 router.post('/deleteUser', authJWT, deleteUser);
 
 module.exports = router;
