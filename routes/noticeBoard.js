@@ -7,6 +7,11 @@ const Board = require("../models/NoticeBoard");
 const authJWT = require("../utils/authJWT");
 const User = require("../models/user");
 
+/**
+ * @author ovmkas
+ * @created  2023-12-06
+ * @description 공지사항 글번호를 위한 시퀀스 생성 컴포넌트
+ */
 const initializeSequence = async (sequenceName) => {
     try {
         const existingSequence = await Counters.findById(sequenceName);
@@ -23,6 +28,11 @@ const initializeSequence = async (sequenceName) => {
     }
 };
 
+/**
+ * @author ovmkas
+ * @created  2023-12-06
+ * @description 공지사항 마지막 글번호를 불러오기 위한 컴포넌트
+ */
 const getNextSequenceValue = async (sequenceName) => {
     try {
         const sequenceDocument = await Counters.findOneAndUpdate(
@@ -40,6 +50,13 @@ const getNextSequenceValue = async (sequenceName) => {
     }
 };
 
+/**
+ * @author ovmkas
+ * @created  2023-12-06
+ * @description 공지사항 작성 컴포넌트
+ * @modified 2023-12-14
+ * @modification Token 검증 작업 추가
+ */
 router.post("/white", authJWT, async (req, res, next) => {
     try {
         await initializeSequence('MedisonDiaryBoard'); // 시퀀스 초기화
@@ -57,11 +74,16 @@ router.post("/white", authJWT, async (req, res, next) => {
     }
 });
 
+/**
+ * @author ovmkas
+ * @created  2023-12-11
+ * @description 공지사항 리스트 출력 
+ */
 router.get('/:pageNum', async (req,res,next)=>{
     try{
         console.log("리스트 요청")
         const pageNum = req.params.pageNum || 1;
-        const pageSize = 3;
+        const pageSize = 3; //페이지 출력 갯수
         const mongoSkip = (pageNum - 1) * pageSize;
 
         const boards = await NoticeBoard.find({})
@@ -77,7 +99,11 @@ router.get('/:pageNum', async (req,res,next)=>{
     }
 });
 
-
+/**
+ * @author ovmkas
+ * @created  2023-12-06
+ * @description 공지사항 글 상세 보기
+ */
 router.get("/noticeView/:bno", async (req,res,next)=>{
     try {
         console.log(req.params.bno);
@@ -90,6 +116,11 @@ router.get("/noticeView/:bno", async (req,res,next)=>{
     }
 })
 
+/**
+ * @author ovmkas
+ * @created  2023-12-07
+ * @description 공지사항 글 수정(파라미터)
+ */
 router.get("/noticeUpdate/:bno", async (req,res,next)=>{
     try {
         console.log(req.params.bno);
@@ -102,6 +133,11 @@ router.get("/noticeUpdate/:bno", async (req,res,next)=>{
     }
 })
 
+/**
+ * @author ovmkas
+ * @created  2023-12-07
+ * @description 공지사항 글 수정(객체)
+ */
 router.put("/update", async (req, res, next) => {
     try {
         await Board.updateOne(
@@ -121,6 +157,11 @@ router.put("/update", async (req, res, next) => {
     }
 });
 
+/**
+ * @author ovmkas
+ * @created  2023-12-08
+ * @description 공지사항 글 삭제
+ */
 router.delete("/delete", async (req, res, next) => {
     try {
         const user = await User.findOne({userId : req.body.userId})
@@ -138,6 +179,12 @@ router.delete("/delete", async (req, res, next) => {
     }
 });
 
+
+/**
+ * @author ovmkas
+ * @created  2023-12-14
+ * @description 공지사항 검색(글제목, 글작성자, 글내용)
+ */
 router.post("/search", async (req, res, next) => {
     try {
         console.log("search 넘어온 데이터 " , req.body);

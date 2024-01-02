@@ -1,6 +1,11 @@
 const mongoose = require("mongoose");
 // const AutoIncrement = require("mongoose-sequence")(mongoose);
 
+/**
+ * @author ovmkas
+ * @data 2023-12-06
+ * @description 공지사항 테이블
+ */
 const tbl_NoticeBoard = new mongoose.Schema({
     userId : {type : String, required : true},
     title : { type : String, required : true},
