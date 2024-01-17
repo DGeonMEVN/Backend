@@ -137,8 +137,10 @@ router.get("/noticeUpdate/:bno", async (req,res,next)=>{
  * @author ovmkas
  * @created  2023-12-07
  * @description 공지사항 글 수정(객체)
+ * @modified 2024-01-11
+ * @modification Token 검증 작업 추가
  */
-router.put("/update", async (req, res, next) => {
+router.put("/update", authJWT, async (req, res, next) => {
     try {
         await Board.updateOne(
             {bno : req.body.bno},
@@ -161,8 +163,10 @@ router.put("/update", async (req, res, next) => {
  * @author ovmkas
  * @created  2023-12-08
  * @description 공지사항 글 삭제
+ * @modified 2024-01-11
+ * @modification Token 검증 작업 추가
  */
-router.delete("/delete", async (req, res, next) => {
+router.delete("/delete", authJWT, async (req, res, next) => {
     try {
         const user = await User.findOne({userId : req.body.userId})
         const board = await Board.findOne( { bno : req.body.bno});
