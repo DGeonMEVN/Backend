@@ -108,7 +108,6 @@ router.get("/noticeView/:bno", async (req,res,next)=>{
     try {
         console.log(req.params.bno);
         const Board = await NoticeBoard.findOne({bno : req.params.bno})
-        console.log(Board)
         res.status(200).json({ ok : true, Board : Board});
     }
     catch (err){
@@ -125,7 +124,6 @@ router.get("/noticeUpdate/:bno", async (req,res,next)=>{
     try {
         console.log(req.params.bno);
         const Board = await NoticeBoard.findOne({bno : req.params.bno})
-        console.log(Board)
         res.status(200).json({ ok : true, Board : Board});
     }
     catch (err){
@@ -152,6 +150,7 @@ router.put("/update", authJWT, async (req, res, next) => {
                         updateDate: Date.now()
                     }
             })
+
         res.status(200).send({ ok: true });
     } catch (err) {
         console.error('Error stack:', err.stack); // 에러 스택 출력 추가
