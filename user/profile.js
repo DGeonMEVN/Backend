@@ -42,7 +42,6 @@ const getProfile = async (req, res) => {
 const modifyProfile  = async (req,res) => {
     try {
         const user = await User.findOne({userId: req.body.userId});
-
         if(user && bcrypt.compareSync(req.body.userPw, user.userPw)) {
             // user.userName = req.body.userName;
             // user.userPw = bcrypt.hashSync(req.body.userPw, 10);
@@ -58,9 +57,9 @@ const modifyProfile  = async (req,res) => {
                             updateDate: Date.now()
                         }
                 })
-            res.status(200).json({ok: true, message: "modify Success!"})
+            res.status(200).json({ok: true, passCheck : true, message: "modify Success!"})
         }else{
-            res.status(401).json({ok: false, message: "password failed!!"})
+            res.status(200).json({ok: false, passCheck :  false, message: "password failed!!"})
         }
     } catch (err) {
         res.status(401).json({ok: false, message: "modify failed!!"})
@@ -86,13 +85,15 @@ const passwordCheck = async (req,res)=>{
                         }
             })
             res.status(200).json({
-              ok:true,
-              message : "회원이 맞습니다",
+                ok:true,
+                passCheck : true,
+                message : "회원이 맞습니다",
             })
         }else{
-            res.status(401).json({
+            res.status(200).json({
                 ok:false,
-                message : "회원이 없거나 회원정보가 다릅니다",
+                passCheck : false,
+                message : "비밀번호가 다릅니다",
             })
         }
     }catch (err){
@@ -116,11 +117,14 @@ const deleteUser = async(req, res) =>{
             await User.deleteOne({userId : req.body.userId});
             res.status(200).send({
                 ok:true,
+                passCheck : true,
                 message : "회원이 맞습니다",
             })
         }else{
-            res.status(401).send({
+            console.log("비밀번호 틀리다")
+            res.status(200).send({
                 ok:false,
+                passCheck : false,
                 message : "회원이 없거나 회원정보가 다릅니다",
             })
         }
