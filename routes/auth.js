@@ -19,7 +19,7 @@ const {getProfile, modifyProfile, passwordCheck, deleteUser} = require('../user/
  * @description 회원가입을 위한  join 사용하지 않음
  */
 router.post('/join', isNotLoggedIn, async (req, res, next) => {
-    console.log("조인")
+    // console.log("조인")
     const { userId, userPw, userName, gender } = req.body; // 프론트에서 보낸 폼데이터를 받는다.
 
     try {

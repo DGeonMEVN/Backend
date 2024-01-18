@@ -14,7 +14,7 @@ const getProfile = async (req, res) => {
     const user = await User.findOne({
             userId: userId
     });
-    console.log("getProfile user = ", user);
+    // console.log("getProfile user = ", user);
     if(user){
         const { userId, userPw, userName, gender } = user;
         res.status(200).send({
@@ -121,7 +121,6 @@ const deleteUser = async(req, res) =>{
                 message : "회원이 맞습니다",
             })
         }else{
-            console.log("비밀번호 틀리다")
             res.status(200).send({
                 ok:false,
                 passCheck : false,

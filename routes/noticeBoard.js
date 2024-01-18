@@ -81,7 +81,7 @@ router.post("/white", authJWT, async (req, res, next) => {
  */
 router.get('/:pageNum', async (req,res,next)=>{
     try{
-        console.log("리스트 요청")
+        // console.log("리스트 요청")
         const pageNum = req.params.pageNum || 1;
         const pageSize = 3; //페이지 출력 갯수
         const mongoSkip = (pageNum - 1) * pageSize;
@@ -106,7 +106,7 @@ router.get('/:pageNum', async (req,res,next)=>{
  */
 router.get("/noticeView/:bno", async (req,res,next)=>{
     try {
-        console.log(req.params.bno);
+        // console.log(req.params.bno);
         const Board = await NoticeBoard.findOne({bno : req.params.bno})
         res.status(200).send({ ok : true, Board : Board});
     }
@@ -123,7 +123,7 @@ router.get("/noticeView/:bno", async (req,res,next)=>{
 router.get("/noticeUpdate/:bno", authJWT, async (req,res,next)=>{
 
     try {
-        console.log(req.params.bno);
+        // console.log(req.params.bno);
         const Board = await NoticeBoard.findOne({bno : req.params.bno})
         res.status(200).send({ ok : true, Board : Board});
     }
@@ -139,7 +139,7 @@ router.get("/noticeUpdate/:bno", authJWT, async (req,res,next)=>{
  */
 router.get("/noticeUpdate/detail/:bno", authJWT, async (req,res,next)=>{
     try {
-        console.log(req.params.bno);
+        // console.log(req.params.bno);
         const Board = await NoticeBoard.findOne({bno : req.params.bno})
         res.status(200).send({ ok : true, Board : Board});
     }
@@ -208,7 +208,7 @@ router.delete("/delete", authJWT, async (req, res, next) => {
  */
 router.post("/search", async (req, res, next) => {
     try {
-        console.log("search 넘어온 데이터 " , req.body);
+        // console.log("search 넘어온 데이터 " , req.body);
         let pageNum = req.body.pageNum || 1;
         let pageSize = 3;
         let mongoSkip = (pageNum - 1) * pageSize;
@@ -229,7 +229,7 @@ router.post("/search", async (req, res, next) => {
         if (orConditions.length > 0) {
             query.$or = orConditions;
         }
-        console.log("query", query)
+        // console.log("query", query)
         let boards = await NoticeBoard.find(query)
             .sort({"bno" : -1})
             .skip(mongoSkip)
@@ -239,9 +239,9 @@ router.post("/search", async (req, res, next) => {
         if(pageCount===0){
             pageCount=1;
         }
-        console.log("boardCount", boardCount)
-        console.log("pageSize", pageSize)
-        console.log("pageCount", pageCount)
+        // console.log("boardCount", boardCount)
+        // console.log("pageSize", pageSize)
+        // console.log("pageCount", pageCount)
         res.status(200).send({ ok : true, boards : boards, pageCount : pageCount });
 
     } catch (err) {
