@@ -108,10 +108,10 @@ router.get("/noticeView/:bno", async (req,res,next)=>{
     try {
         console.log(req.params.bno);
         const Board = await NoticeBoard.findOne({bno : req.params.bno})
-        res.status(200).json({ ok : true, Board : Board});
+        res.status(200).send({ ok : true, Board : Board});
     }
     catch (err){
-        res.status(400).json({ok:false, message : "failed!!"})
+        res.status(400).send({ok:false, message : "failed!!"})
     }
 })
 
@@ -120,16 +120,34 @@ router.get("/noticeView/:bno", async (req,res,next)=>{
  * @created  2023-12-07
  * @description 공지사항 글 수정(파라미터)
  */
-router.get("/noticeUpdate/:bno", async (req,res,next)=>{
+router.get("/noticeUpdate/:bno", authJWT, async (req,res,next)=>{
+
     try {
         console.log(req.params.bno);
         const Board = await NoticeBoard.findOne({bno : req.params.bno})
-        res.status(200).json({ ok : true, Board : Board});
+        res.status(200).send({ ok : true, Board : Board});
     }
     catch (err){
-        res.status(400).json({ok:false, message : "failed!!"})
+        res.status(400).send({ok:false, message : "failed!!"})
     }
 })
+
+/**
+ * @author ovmkas
+ * @created  2023-01-07
+ * @description 공지사항 글 수정(파라미터)
+ */
+router.get("/noticeUpdate/detail/:bno", authJWT, async (req,res,next)=>{
+    try {
+        console.log(req.params.bno);
+        const Board = await NoticeBoard.findOne({bno : req.params.bno})
+        res.status(200).send({ ok : true, Board : Board});
+    }
+    catch (err){
+        res.status(400).send({ok:false, message : "failed!!"})
+    }
+})
+
 
 /**
  * @author ovmkas
