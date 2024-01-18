@@ -51,8 +51,8 @@ module.exports = {
             const data = await redisClient.get(userId)
             // const data = await redisClient.get(userId);
             // const data = await redisClient.get(username)
-            console.log('data = ', data)
-            console.log('token = ', token)
+            // console.log('data = ', data)
+            // console.log('token = ', token)
             if(token === data) {
                 try {
                     jwt.verify(token, secret);
@@ -70,7 +70,6 @@ module.exports = {
             console.error('error', error)
             return false;
         } finally {
-            console.log("finally");
         }
     },
 };

@@ -28,7 +28,8 @@ module.exports = () => {
         // 즉, id를 sql로 조회해서 전체 정보를 가져오는 복구 로직이다.
         User.findOne({ userId : userId} )
             .then((user) => {done(null, user)
-                console.log("user::",user)}) //? done()이 되면 이제 다시 req.login(user, ...) 쪽으로 되돌아가 다음 미들웨어를 실행하게 된다.
+                // console.log("user::",user)
+            }) //? done()이 되면 이제 다시 req.login(user, ...) 쪽으로 되돌아가 다음 미들웨어를 실행하게 된다.
             .catch(err => done(err));
 
     });
