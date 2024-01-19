@@ -43,6 +43,7 @@ app.use((req, res, next) => {
 // 라우터 설정
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/noticeBoard', require('./routes/noticeBoard'));
+app.use('/api/diaryBoard', require('./routes/diaryBoard'));
 
 // 서버 리스닝 및 포트 출력
 app.listen(port, function(){
