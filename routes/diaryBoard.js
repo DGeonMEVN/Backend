@@ -8,6 +8,7 @@ const { diaryCounters } = require("../models/diaryCounters");
 const authJWT = require("../utils/authJWT");
 const User = require("../models/user");
 const {Promise} = require("mongoose");
+const Board = require("../models/NoticeBoard");
 
 /**
  * @author ovmkas
@@ -68,31 +69,43 @@ router.post("/white", authJWT, async (req, res, next) => {
 
         diaryBoard.userId = req.body.userId;
         diaryBoard.bno = sequenceValue;
-        diaryBoard.weight = req.body.weight;
+        if(req.body.weight !== "") {
+            diaryBoard.weight = req.body.weight;
+        }else{
+            diaryBoard.weight = 0;
+        }
         diaryBoard.significant = req.body.significant;
 
         console.log("기본",diaryBoard);
 
         bloodPressure.userId = req.body.userId;
         bloodPressure.bno = sequenceValue;
-        bloodPressure.systolic = req.body.systolic;
-        bloodPressure.diastolic = req.body.diastolic;
-        bloodPressure.pulse = req.body.pulse;
-
-        console.log("혈압",bloodPressure);
+        if(req.body.systolic !== "") {
+            bloodPressure.systolic = req.body.systolic;
+        }else
+        {
+            bloodPressure.systolic = 0;
+        }
+        if(req.body.diastolic !== "") {
+            bloodPressure.diastolic = req.body.diastolic;
+        }else
+        {
+            bloodPressure.diastolic = 0;
+        }
+        if(req.body.pulse !== "") {
+            bloodPressure.pulse = req.body.pulse;
+        }else
+        {
+            bloodPressure.pulse = 0;
+        }
 
         takit.userId = req.body.userId;
         takit.bno = sequenceValue;
         takit.take = req.body.take;
 
-        console.log("복용",takit);
-
         gargle.userId = req.body.userId;
         gargle.bno = sequenceValue;
         gargle.gargle = req.body.gargle;
-
-        console.log("가글", gargle);
-
 
         await diaryBoard.save();
         await bloodPressure.save();
@@ -111,7 +124,7 @@ router.post("/white", authJWT, async (req, res, next) => {
  * @created  2024-01-19
  * @description 일지 리스트 출력
  */
-router.get('/:pageNum', async (req,res,next)=>{
+router.get('/:pageNum', authJWT, async (req,res,next)=>{
     try{
         // console.log("리스트 요청")
         const pageNum = req.params.pageNum || 1;
@@ -191,8 +204,7 @@ router.get('/:pageNum', async (req,res,next)=>{
 //     }
 // });
 
-router.post("/search", async (req, res, next) => {
-    console.log("서치로 넘어옴")
+router.post("/search", authJWT, async (req, res, next) => {
     try {
         let pageNum = req.body.pageNum || 1;
         let pageSize = 3;
@@ -218,10 +230,13 @@ router.post("/search", async (req, res, next) => {
         if (req.body.significantCheck) {
             orConditions.push({ significant: { $regex: new RegExp(keyword, "i") } });
         }
+        if(req.body.userId){
+            orConditions.push({ userId: req.body.userId});
+        }
         if (orConditions.length > 0) {
             query.$or = orConditions;
         }
-
+        console.log(query);
         // $lookup을 사용하여 테이블을 조인합니다.
         let diaryBoardList = await DiaryBoard.aggregate([
             {
@@ -281,7 +296,7 @@ router.post("/search", async (req, res, next) => {
  * @created  2023-01-23
  * @description 일지 글 상세 보기
  */
-router.post("/diaryView", async (req,res,next)=>{
+router.post("/diaryView", authJWT, async (req,res,next)=>{
     try {
         console.log("diaryView")
         console.log(req.body.bno);
@@ -301,7 +316,72 @@ router.post("/diaryView", async (req,res,next)=>{
 
 /**
  * @author ovmkas
- * @created  2023-12-07
- * @description 공지사항 글 수정(파라미터)
+ * @created  2024-01-24
+ * @description 일지 삭제
  */
+router.delete("/delete", authJWT, async (req, res, next) => {
+    try {
+        const user = await User.findOne({userId : req.body.userId})
+        const diaryboard = await DiaryBoard.findOne( { bno : req.body.bno });
+        const bloodPressure = BloodPressure.find({bno: req.body.bno, userId : req.body.userId});
+        const take = Takit.find({bno: req.body.bno, userId : req.body.userId});
+        const gargle = Gargle.find({bno: req.body.bno, userId : req.body.userId});
+        if(user.userId === diaryboard.userId){
+            await diaryboard.deleteOne({bno : diaryboard.bno});
+            await bloodPressure.deleteMany({bno: req.body.bno, userId : req.body.userId});
+            await take.deleteOne({bno: req.body.bno, userId : req.body.userId});
+            await gargle.deleteMany({bno: req.body.bno, userId : req.body.userId});
+            res.status(200).send({ ok: true });
+        }else{
+            res.status(400).send({ ok: false });
+        }
+
+    } catch (err) {
+        console.error('Error stack:', err.stack); // 에러 스택 출력 추가
+        res.status(400).send({ ok: false, error: err.message });
+    }
+});
+
+/**
+ * @author ovmkas
+ * @created  2024-01-24
+ * @description 일지 수정(객체)
+ */
+router.put("/update", authJWT, async (req, res, next) => {
+    try {
+        await DiaryBoard.updateOne(
+            {bno : req.body.bno, userId : req.body.userId},
+            {
+                $set:
+                    {
+                        weight : req.body.weight,
+                        significant : req.body.significant,
+                        updateDate: Date.now()
+                    }
+        })
+        await Takit.updateOne(
+            {bno : req.body.bno, userId : req.body.userId},
+            {
+                $set:
+                    {
+                        take : req.body.take,
+                        updateDate: Date.now()
+                    }
+        })
+        await Gargle.updateOne(
+            {bno : req.body.bno, userId : req.body.userId},
+            {
+                $set:
+                    {
+                        gargle : req.body.gargle,
+                        updateDate: Date.now()
+                    }
+            })
+
+        res.status(200).send({ ok: true });
+    } catch (err) {
+        console.error('Error stack:', err.stack); // 에러 스택 출력 추가
+        res.status(400).send({ ok: false, error: err.message });
+    }
+});
 module.exports = router;
