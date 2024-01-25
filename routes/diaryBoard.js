@@ -9,6 +9,7 @@ const authJWT = require("../utils/authJWT");
 const User = require("../models/user");
 const {Promise} = require("mongoose");
 const Board = require("../models/NoticeBoard");
+const {diaryBPCounters} = require('../models/diaryBloodPressureCounters');
 
 /**
  * @author ovmkas
@@ -55,6 +56,50 @@ const getNextSequenceValue = async (sequenceName) => {
 
 /**
  * @author ovmkas
+ * @created  2024-01-25
+ * @description 혈압 글번호를 위한 시퀀스 생성 컴포넌트
+ */
+const initializeSequenceBP = async (sequenceName) => {
+    try {
+        const existingSequence = await diaryBPCounters.findById(sequenceName);
+
+        if (!existingSequence) {
+            await diaryBPCounters.create({
+                _id: sequenceName,
+                sequence_value: 0,
+            });
+        }
+    } catch (error) {
+        console.error('Error initializing sequence:', error);
+        throw error;
+    }
+};
+
+/**
+ * @author ovmkas
+ * @created  2024-01-25
+ * @description 혈압 마지막 글번호를 불러오기 위한 컴포넌트
+ */
+const getNextSequenceBPValue = async (sequenceName) => {
+    try {
+        const sequenceDocument = await diaryBPCounters.findOneAndUpdate(
+            { _id: sequenceName },
+            { $inc: { sequence_value: 1 } },
+            { new: true }
+        );
+        if (!sequenceDocument) {
+            throw new Error('Sequence document not found.');
+        }
+        return sequenceDocument.sequence_value;
+    } catch (error) {
+        console.error('Error getting next sequence value:', error);
+        throw error;
+    }
+};
+
+
+/**
+ * @author ovmkas
  * @created  2024-01-18
  * @description 일지 작성 컴포넌트
  */
@@ -62,13 +107,21 @@ router.post("/white", authJWT, async (req, res, next) => {
     try {
         await initializeSequence('MedisonDiaryDiaryBoard'); // 시퀀스 초기화
         const sequenceValue = await getNextSequenceValue('MedisonDiaryDiaryBoard');
+
+        await initializeSequenceBP('MedisonDiaryDiaryBoard'); // 시퀀스 초기화
+        const sequenceValueBP = await getNextSequenceValue('MedisonDiaryDiaryBoard');
+
         const diaryBoard = new DiaryBoard();
         const bloodPressure = new BloodPressure();
         const gargle = new Gargle();
         const takit = new Takit();
 
+
+
         diaryBoard.userId = req.body.userId;
         diaryBoard.bno = sequenceValue;
+
+        bloodPressure.bpno = sequenceValueBP;
         if(req.body.weight !== "") {
             diaryBoard.weight = req.body.weight;
         }else{
@@ -349,6 +402,27 @@ router.delete("/delete", authJWT, async (req, res, next) => {
  */
 router.put("/update", authJWT, async (req, res, next) => {
     try {
+        const existingBloodPressureUpdates = req.body.bloodPressureList
+            .filter(item => item.bpno) // 기존 항목만 필터링
+            .map(item => ({
+                updateOne: {
+                    filter: { bno: req.body.bno, userId: req.body.userId, bpno: item.bpno },
+                    update: { $set: item },
+                }
+            }));
+        const newBpno = await getNextSequenceValue('MedisonDiaryDiaryBoard');
+        // 새로 추가된 항목 추가
+        const newBloodPressureUpdates = req.body.bloodPressureList
+            .filter(item => !item.bpno) // 새로 추가된 항목만 필터링
+            .map(item => {
+
+                return {
+                    insertOne: {
+                        document: { ...item, userId: req.body.userId, bno: req.body.bno, bpno: newBpno }
+                    }
+                };
+            });
+
         await DiaryBoard.updateOne(
             {bno : req.body.bno, userId : req.body.userId},
             {
@@ -377,6 +451,15 @@ router.put("/update", authJWT, async (req, res, next) => {
                         updateDate: Date.now()
                     }
             })
+        // 기존 항목 업데이트
+        if (existingBloodPressureUpdates.length > 0) {
+            await BloodPressure.bulkWrite(existingBloodPressureUpdates);
+        }
+
+        // 새로 추가된 항목 추가
+        if (newBloodPressureUpdates.length > 0) {
+            await BloodPressure.bulkWrite(newBloodPressureUpdates);
+        }
 
         res.status(200).send({ ok: true });
     } catch (err) {
