@@ -8,6 +8,7 @@ const mongoose = require("mongoose");
 const tbl_diaryBloodPressure = new mongoose.Schema({
     userId : { type : String, required: true},
     bno : {type : Number, required : true },
+    bpno : { type : Number, required : true},
     systolic : { type : Number }, //수축기
     diastolic : { type : Number }, //이완기
     pulse : { type : Number },
