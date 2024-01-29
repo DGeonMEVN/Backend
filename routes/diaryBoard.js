@@ -129,7 +129,6 @@ router.post("/white", authJWT, async (req, res, next) => {
         }
         diaryBoard.significant = req.body.significant;
 
-        console.log("기본",diaryBoard);
 
         bloodPressure.userId = req.body.userId;
         bloodPressure.bno = sequenceValue;
@@ -259,7 +258,7 @@ router.get('/:pageNum', authJWT, async (req,res,next)=>{
 
 router.post("/search", authJWT, async (req, res, next) => {
     try {
-        let pageNum = req.body.pageNum || 1;
+        let pageNum = parseInt(req.body.pageNum, 10) || 1;
         let pageSize = 3;
         let mongoSkip = (pageNum - 1) * pageSize;
 
@@ -289,7 +288,6 @@ router.post("/search", authJWT, async (req, res, next) => {
         if (orConditions.length > 0) {
             query.$or = orConditions;
         }
-        console.log(query);
         // $lookup을 사용하여 테이블을 조인합니다.
         let diaryBoardList = await DiaryBoard.aggregate([
             {
@@ -351,9 +349,6 @@ router.post("/search", authJWT, async (req, res, next) => {
  */
 router.post("/diaryView", authJWT, async (req,res,next)=>{
     try {
-        console.log("diaryView")
-        console.log(req.body.bno);
-        console.log(req.body.userId);
         // console.log(req.params.bno);
         const Board = await DiaryBoard.findOne({bno: req.body.bno, userId : req.body.userId})
         const Gargles = await Gargle.find({bno : req.body.bno, userId : req.body.userId})
@@ -410,19 +405,33 @@ router.put("/update", authJWT, async (req, res, next) => {
                     update: { $set: item },
                 }
             }));
-        const newBpno = await getNextSequenceValue('MedisonDiaryDiaryBoard');
+
         // 새로 추가된 항목 추가
-        const newBloodPressureUpdates = req.body.bloodPressureList
-            .filter(item => !item.bpno) // 새로 추가된 항목만 필터링
-            .map(item => {
+        // const newBloodPressureUpdates = req.body.bloodPressureList
+        //     .filter(item => !item.bpno) // 새로 추가된 항목만 필터링
+        //     .map(item => {
+        //         const newBpno = await getNextSequenceBPValue('MedisonDiaryDiaryBoard');
+        //         return {
+        //             insertOne: {
+        //                 document: { ...item, userId: req.body.userId, bno: req.body.bno, bpno: newBpno }
+        //             }
+        //         };
+        //     });
 
-                return {
+
+        const newBloodPressureUpdates = [];
+        const bloodPressureList = req.body.bloodPressureList;
+
+        for (const item of bloodPressureList) {
+            if (!item.bpno) {
+                const newBpno = await getNextSequenceBPValue('MedisonDiaryDiaryBoard');
+                newBloodPressureUpdates.push({
                     insertOne: {
-                        document: { ...item, userId: req.body.userId, bno: req.body.bno, bpno: newBpno }
+                        document: { ...item, userId: req.body.userId, bno: req.body.bno, bpno: Number(newBpno) }
                     }
-                };
-            });
-
+                });
+            }
+        }
         await DiaryBoard.updateOne(
             {bno : req.body.bno, userId : req.body.userId},
             {
@@ -467,4 +476,5 @@ router.put("/update", authJWT, async (req, res, next) => {
         res.status(400).send({ ok: false, error: err.message });
     }
 });
+
 module.exports = router;
