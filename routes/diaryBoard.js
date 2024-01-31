@@ -258,37 +258,114 @@ router.get('/:pageNum', authJWT, async (req,res,next)=>{
 
 router.post("/search", authJWT, async (req, res, next) => {
     try {
+
         let pageNum = parseInt(req.body.pageNum, 10) || 1;
         let pageSize = 3;
         let mongoSkip = (pageNum - 1) * pageSize;
 
         let keyword = req.body.search;
+        console.log(Number(keyword));
         let query = {};
         const orConditions = [];
-
         // 검색할 각 필드에 대한 조건을 확인하고 추가합니다.
-        if (req.body.systolicCheck) {
-            orConditions.push({ systolic: { $regex: new RegExp(keyword, "i") } });
+        if (req.body.systolic) {
+            orConditions.push({ systolic: Number(keyword) });
         }
-        if (req.body.diastolicCheck) {
-            orConditions.push({ diastolic: { $regex: new RegExp(keyword, "i") } });
+        if (req.body.diastolic) {
+            orConditions.push({ diastolic: { $eq: Number(keyword) } });
         }
-        if (req.body.pulseCheck) {
-            orConditions.push({ pulse: { $regex: new RegExp(keyword, "i") } });
+        if (req.body.pulse) {
+            orConditions.push({ pulse: { $eq: Number(keyword) }  });
         }
-        if (req.body.weightCheck) {
-            orConditions.push({ weight: { $regex: new RegExp(keyword, "i") } });
+        if (req.body.weight) {
+            orConditions.push({ weight: { $eq: Number(keyword) }  });
         }
-        if (req.body.significantCheck) {
+        if (req.body.significant) {
             orConditions.push({ significant: { $regex: new RegExp(keyword, "i") } });
         }
-        if(req.body.userId){
-            orConditions.push({ userId: req.body.userId});
+        if (req.body.userId) {
+            query.userId = req.body.userId;
         }
         if (orConditions.length > 0) {
             query.$or = orConditions;
         }
+        console.log("query", query);
         // $lookup을 사용하여 테이블을 조인합니다.
+        // let diaryBoardList = await DiaryBoard.aggregate([
+        //     {
+        //         $match: query
+        //     },
+        //     {
+        //         $lookup: {
+        //             from: "MedisonDiary_diaryBloodPressure",
+        //             let: {
+        //                 bno: "$bno",
+        //                 userId: "$userId",
+        //             },
+        //             pipeline: [{
+        //                 $match: {
+        //                     $expr: {
+        //                         $and: [
+        //                             { $eq: ["$$bno", "$bno"] },
+        //                             { $eq: ["$$userId", "$userId"] },
+        //                         ]
+        //                     }
+        //                 }
+        //             }],
+        //             as: "bloodPressure"
+        //         }
+        //     },
+        //     {
+        //         $lookup: {
+        //             from: "MedisonDiary_diaryTakit",
+        //             let: {
+        //                 bno: "$bno",
+        //                 userId: "$userId",
+        //             },
+        //             pipeline: [{
+        //                 $match: {
+        //                     $expr: {
+        //                         $and: [
+        //                             { $eq: ["$$bno", "$bno"] },
+        //                             { $eq: ["$$userId", "$userId"] },
+        //                         ]
+        //                     }
+        //                 }
+        //             }],
+        //             as: "take"
+        //         }
+        //     },
+        //     {
+        //         $lookup: {
+        //             from: "MedisonDiary_diaryGargle",
+        //             let: {
+        //                 bno: "$bno",
+        //                 userId: "$userId",
+        //             },
+        //             pipeline: [{
+        //                 $match: {
+        //                     $expr: {
+        //                         $and: [
+        //                             { $eq: ["$$bno", "$bno"] },
+        //                             { $eq: ["$$userId", "$userId"] },
+        //                         ]
+        //                     }
+        //                 }
+        //             }],
+        //             as: "gargle"
+        //         }
+        //     },
+        //     {
+        //         $sort: { "bno": -1 }
+        //     },
+        //     {
+        //         $skip: mongoSkip
+        //     },
+        //     {
+        //         $limit: pageSize
+        //     }
+        // ]);
+
         let diaryBoardList = await DiaryBoard.aggregate([
             {
                 $match: query
@@ -329,11 +406,10 @@ router.post("/search", authJWT, async (req, res, next) => {
         ]);
 
         let boardCount = await DiaryBoard.count(query);
-        let pageCount = Math.round(boardCount / pageSize);
+        let pageCount = Math.ceil(boardCount / pageSize);
         if (pageCount === 0) {
             pageCount = 1;
         }
-
         res.status(200).send({ ok: true, diaryBoardList: diaryBoardList, pageCount: pageCount });
 
     } catch (err) {
