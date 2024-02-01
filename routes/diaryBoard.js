@@ -268,18 +268,6 @@ router.post("/search", authJWT, async (req, res, next) => {
         let query = {};
         const orConditions = [];
         // 검색할 각 필드에 대한 조건을 확인하고 추가합니다.
-        if (req.body.systolic) {
-            orConditions.push({ systolic: Number(keyword) });
-        }
-        if (req.body.diastolic) {
-            orConditions.push({ diastolic: { $eq: Number(keyword) } });
-        }
-        if (req.body.pulse) {
-            orConditions.push({ pulse: { $eq: Number(keyword) }  });
-        }
-        if (req.body.weight) {
-            orConditions.push({ weight: { $eq: Number(keyword) }  });
-        }
         if (req.body.significant) {
             orConditions.push({ significant: { $regex: new RegExp(keyword, "i") } });
         }
@@ -290,81 +278,7 @@ router.post("/search", authJWT, async (req, res, next) => {
             query.$or = orConditions;
         }
         console.log("query", query);
-        // $lookup을 사용하여 테이블을 조인합니다.
-        // let diaryBoardList = await DiaryBoard.aggregate([
-        //     {
-        //         $match: query
-        //     },
-        //     {
-        //         $lookup: {
-        //             from: "MedisonDiary_diaryBloodPressure",
-        //             let: {
-        //                 bno: "$bno",
-        //                 userId: "$userId",
-        //             },
-        //             pipeline: [{
-        //                 $match: {
-        //                     $expr: {
-        //                         $and: [
-        //                             { $eq: ["$$bno", "$bno"] },
-        //                             { $eq: ["$$userId", "$userId"] },
-        //                         ]
-        //                     }
-        //                 }
-        //             }],
-        //             as: "bloodPressure"
-        //         }
-        //     },
-        //     {
-        //         $lookup: {
-        //             from: "MedisonDiary_diaryTakit",
-        //             let: {
-        //                 bno: "$bno",
-        //                 userId: "$userId",
-        //             },
-        //             pipeline: [{
-        //                 $match: {
-        //                     $expr: {
-        //                         $and: [
-        //                             { $eq: ["$$bno", "$bno"] },
-        //                             { $eq: ["$$userId", "$userId"] },
-        //                         ]
-        //                     }
-        //                 }
-        //             }],
-        //             as: "take"
-        //         }
-        //     },
-        //     {
-        //         $lookup: {
-        //             from: "MedisonDiary_diaryGargle",
-        //             let: {
-        //                 bno: "$bno",
-        //                 userId: "$userId",
-        //             },
-        //             pipeline: [{
-        //                 $match: {
-        //                     $expr: {
-        //                         $and: [
-        //                             { $eq: ["$$bno", "$bno"] },
-        //                             { $eq: ["$$userId", "$userId"] },
-        //                         ]
-        //                     }
-        //                 }
-        //             }],
-        //             as: "gargle"
-        //         }
-        //     },
-        //     {
-        //         $sort: { "bno": -1 }
-        //     },
-        //     {
-        //         $skip: mongoSkip
-        //     },
-        //     {
-        //         $limit: pageSize
-        //     }
-        // ]);
+
 
         let diaryBoardList = await DiaryBoard.aggregate([
             {
