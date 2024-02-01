@@ -10,8 +10,8 @@ const tbl_User = new mongoose.Schema({
     userPw : { type : String, required : true},
     userName : { type : String, required : true},
     gender : {type : Boolean, require : true},
-    regDate : { type : Date, default : Date.now()},
-    updateDate : {type : Date, default: Date.now()}
+    regDate: { type: Date, default: () => new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }) },
+    updateDate: { type: Date, default: () => new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }) },
 });
 
 module.exports = mongoose.model("MedisonDiaryUser", tbl_User, "MedisonDiary_User");

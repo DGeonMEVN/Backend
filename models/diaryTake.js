@@ -9,8 +9,8 @@ const tbl_diaryTake = new mongoose.Schema({
     userId : { type : String, required: true},
     bno : {type : Number, required : true },
     take : {type : Boolean},
-    regDate : { type : Date, default : Date.now()},
-    updateDate : { type : Date, default : Date.now()},
+    regDate: { type: Date, default: () => new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }) },
+    updateDate: { type: Date, default: () => new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }) },
 });
 
 module.exports = mongoose.model("MedisonDiaryTakit", tbl_diaryTake, "MedisonDiary_diaryTakit");

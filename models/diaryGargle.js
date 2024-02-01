@@ -9,8 +9,8 @@ const tbl_diaryGargle = new mongoose.Schema({
     userId : { type : String, required: true},
     bno : {type : Number, required : true },
     gargle : {type : Boolean},
-    regDate : { type : Date, default : Date.now()},
-    updateDate : { type : Date, default : Date.now()},
+    regDate: { type: Date, default: () => new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }) },
+    updateDate: { type: Date, default: () => new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }) },
 });
 
 module.exports = mongoose.model("MedisonDiaryGargle", tbl_diaryGargle, "MedisonDiary_diaryGargle");
