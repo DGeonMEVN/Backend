@@ -491,4 +491,14 @@ router.put("/update", authJWT, async (req, res, next) => {
     }
 });
 
+router.delete('/deleteBloodPressure', authJWT, async(req, res, next)=>{
+   try{
+       await BloodPressure.deleteOne({bpno : req.body.bpno, userId : req.body.userId})
+       res.status(200).send({ ok : true, message : 'success'})
+   }catch (err){
+       console.error('Error stack:', err.stack); // 에러 스택 출력 추가
+       res.status(400).send({ ok: false, error: err.message });
+   }
+});
+
 module.exports = router;
