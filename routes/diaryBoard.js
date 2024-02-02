@@ -432,24 +432,48 @@ router.put("/update", authJWT, async (req, res, next) => {
                         updateDate: Date.now()
                     }
         })
-        await Takit.updateOne(
-            {bno : req.body.bno, userId : req.body.userId},
-            {
-                $set:
-                    {
-                        take : req.body.take,
-                        updateDate: Date.now()
-                    }
-        })
-        await Gargle.updateOne(
-            {bno : req.body.bno, userId : req.body.userId},
-            {
-                $set:
-                    {
-                        gargle : req.body.gargle,
-                        updateDate: Date.now()
-                    }
-            })
+        if(req.body.takeCheck) {
+            await Takit.updateOne(
+                {bno: req.body.bno, userId: req.body.userId},
+                {
+                    $set:
+                        {
+                            take: req.body.take,
+                            updateDate: Date.now()
+                        }
+                })
+        }else {
+            await Takit.updateOne(
+                {bno: req.body.bno, userId: req.body.userId},
+                {
+                    $set:
+                        {
+                            take: req.body.take,
+                            updateDate: req.body.takeUpdatedate
+                        }
+                })
+        }
+        if(req.body.gargleCheck) {
+            await Gargle.updateOne(
+                {bno: req.body.bno, userId: req.body.userId},
+                {
+                    $set:
+                        {
+                            gargle: req.body.gargle,
+                            updateDate: Date.now()
+                        }
+                })
+        }else{
+            await Gargle.updateOne(
+                {bno: req.body.bno, userId: req.body.userId},
+                {
+                    $set:
+                        {
+                            gargle: req.body.gargle,
+                            updateDate: req.body.gargleUpdatedate
+                        }
+                })
+        }
         // 기존 항목 업데이트
         if (existingBloodPressureUpdates.length > 0) {
             await BloodPressure.bulkWrite(existingBloodPressureUpdates);
