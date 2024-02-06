@@ -9,16 +9,22 @@ const secret = process.env.SECRET;
  * @description Jwt 생성 및 검증
  */
 module.exports = {
-    sign: (user) => { // access token 발급
+    sign: (user, rememberMeCheck) => { // access token 발급
         const payload = { // access token에 들어갈 payload
             userId: user.userId,
             // expiresIn : '5s',
         };
-
-        return jwt.sign(payload, secret, { // secret으로 sign하여 발급하고 return
-            algorithm: 'HS256', // 암호화 알고리즘
-            expiresIn: '10s', 	  // 유효기간
-        });
+        if(!rememberMeCheck) {
+            return jwt.sign(payload, secret, { // secret으로 sign하여 발급하고 return
+                algorithm: 'HS256', // 암호화 알고리즘
+                expiresIn: '600s', 	  // 유효기간
+            });
+        }else{
+            return jwt.sign(payload, secret, { // secret으로 sign하여 발급하고 return
+                algorithm: 'HS256', // 암호화 알고리즘
+                expiresIn: '604800s', 	  // 유효기간
+            });
+        }
     },
     verify: (token) => { // access token 검증
         let decoded = null;
@@ -36,11 +42,19 @@ module.exports = {
             };
         }
     },
-    refresh: () => { // refresh token 발급
-        return jwt.sign({}, secret, { // refresh token은 payload 없이 발급
-            algorithm: 'HS256',
-            expiresIn: '180s',
-        });
+    refresh: (rememberMeCheck) => { // refresh token 발급
+        if(!rememberMeCheck) {
+            return jwt.sign({}, secret, { // refresh token은 payload 없이 발급
+                algorithm: 'HS256',
+                // expiresIn: '180s',
+                expiresIn: '600s',//redis에 저장되는 값
+            });
+        }else{
+            return jwt.sign({}, secret, { // refresh token은 payload 없이 발급
+                algorithm: 'HS256',
+                expiresIn: '604800s',//redis에 저장되는 값
+            });
+        }
     },
     refreshVerify: async (token, userId) => {
         // const getAsync = promisify(redisClient.get).bind(redisClient);
