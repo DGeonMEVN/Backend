@@ -62,22 +62,23 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
         if(!user) {
             return res.redirect(`/auth/?loginError=${info.message}`);
         }
-
-
         return req.login(user, { session : false },(loginError) => {
             if(loginError) {
                 console.error(loginError);
                 return next(loginError);
             }
-
             if (user) { // id, pw가 맞다면..
                 // access token과 refresh token을 발급합니다.
-                const accessToken = `Bearer ` + jwt.sign(user);
-                const refreshToken = jwt.refresh();
+                const accessToken = `Bearer ` + jwt.sign(user, req.body.rememberMeCheck);
+                const refreshToken = jwt.refresh(req.body.rememberMeCheck);
                 const userId = user.userId;
-                // 발급한 refresh token을 redis에 key를 user의 id로 하여 저장합니다.
-                redisClient.set(user.userId, refreshToken);
-                redisClient.expire(user.userId, 180 ); //Token 유효기간60*60*24*7
+                if(!req.body.rememberMeCheck) {
+                    // 발급한 refresh token을 redis에 key를 user의 id로 하여 저장합니다.
+                    redisClient.set(user.userId, refreshToken);
+                    redisClient.expire(user.userId, 600); //Token 유효기간60*60*24*7
+                }else{
+                    redisClient.set(user.userId, refreshToken);
+                }
 
                 res.status(200).json({ // client에게 토큰 모두를 반환합니다.
                     ok: true,
