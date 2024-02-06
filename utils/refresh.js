@@ -1,6 +1,6 @@
 const { sign, verify, refreshVerify } = require('./jwt-util');
 const jwt = require('jsonwebtoken');
-
+const redisClient = require("./redisUtil");
 /**
  * @author ovmkas
  * @data 2023-10-30
@@ -8,15 +8,17 @@ const jwt = require('jsonwebtoken');
  * @return Token 전달
  */
 const refresh = async (req, res) => {
+    const userInfo = await redisClient.get(req.headers.userid);
     // console.log("refresh.js 호출")
     // console.log("refresh.js authorization = ", req.headers.authorization)
     // console.log("refresh.js refresh =", req.headers.refresh)
     // access token과 refresh token의 존재 유무를 체크합니다.
     /* vuex의 access, refresh token 값을 받아와 확인 */
     // authorization = accessToken / refresh = refreshToken
-    if (req.headers.authorization && req.headers.refresh) {
+    if (req.headers.authorization && userInfo) {
         const authToken = req.headers.authorization.split('Bearer ')[1];
-        const refreshToken = req.headers.refresh;
+        // const refreshToken = req.headers.refresh;
+        const refreshToken = userInfo;
         // console.log('refresh.js authToken = ', authToken)
         // console.log('refresh.js refreshToken = ', refreshToken)
         // access token 검증 -> expired여야 함.
