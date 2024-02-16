@@ -17,7 +17,7 @@ module.exports = {
         if(!rememberMeCheck) {
             return jwt.sign(payload, secret, { // secret으로 sign하여 발급하고 return
                 algorithm: 'HS256', // 암호화 알고리즘
-                expiresIn: '600s', 	  // 유효기간
+                expiresIn: '3600s', 	  // 유효기간
             });
         }else{
             return jwt.sign(payload, secret, { // secret으로 sign하여 발급하고 return
@@ -47,7 +47,7 @@ module.exports = {
             return jwt.sign({}, secret, { // refresh token은 payload 없이 발급
                 algorithm: 'HS256',
                 // expiresIn: '180s',
-                expiresIn: '600s',//redis에 저장되는 값
+                expiresIn: '3600s',//redis에 저장되는 값
             });
         }else{
             return jwt.sign({}, secret, { // refresh token은 payload 없이 발급

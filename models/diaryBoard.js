@@ -9,8 +9,10 @@ const tbl_diaryBoard = new mongoose.Schema({
     userId : {type : String, required : true},
     weight : { type : Number }, //체중
     significant : { type : String }, //특이사항
-    regDate: { type: Date, default: () => new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }) },
-    updateDate: { type: Date, default: () => new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }) },
+    // regDate: { type: Date, default: () => new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }) },
+    // updateDate: { type: Date, default: () => new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }) },
+    regDate : {type:Date, default: ()=>new Date() },
+    updateDate : {type:Date, default: ()=>new Date() },
     bno : {type : Number, required : true}
 });
 

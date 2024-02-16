@@ -1,6 +1,7 @@
 const { sign, verify, refreshVerify } = require('./jwt-util');
 const jwt = require('jsonwebtoken');
 const redisClient = require("./redisUtil");
+const User = require("../models/user");
 /**
  * @author ovmkas
  * @data 2023-10-30
@@ -8,17 +9,17 @@ const redisClient = require("./redisUtil");
  * @return Token 전달
  */
 const refresh = async (req, res) => {
-    const userInfo = await redisClient.get(req.headers.userid);
+    const userRedis = await redisClient.get(req.headers.userid);
     // console.log("refresh.js 호출")
     // console.log("refresh.js authorization = ", req.headers.authorization)
     // console.log("refresh.js refresh =", req.headers.refresh)
     // access token과 refresh token의 존재 유무를 체크합니다.
     /* vuex의 access, refresh token 값을 받아와 확인 */
     // authorization = accessToken / refresh = refreshToken
-    if (req.headers.authorization && userInfo) {
+    if (req.headers.authorization && userRedis) {
         const authToken = req.headers.authorization.split('Bearer ')[1];
         // const refreshToken = req.headers.refresh;
-        const refreshToken = userInfo;
+        const refreshToken = userRedis;
         // console.log('refresh.js authToken = ', authToken)
         // console.log('refresh.js refreshToken = ', refreshToken)
         // access token 검증 -> expired여야 함.
@@ -55,12 +56,15 @@ const refresh = async (req, res) => {
                     userId: decoded.userId,
                 }
                 const newAccessToken = sign(user);
+                const userInfo = await User.findOne({userId : user.userId});
+                console.log("authority==================================================="+userInfo.authority);
                 res.status(200).json({ // 새로 발급한 access token과 원래 있던 refresh token 모두 클라이언트에게 반환합니다.
                     ok: true,
                     data: {
                         accessToken: `Bearer ${newAccessToken}`,
                         refreshToken,
                         userId : user.userId,
+                        authority : userInfo.authority,
                     },
                 });
             }

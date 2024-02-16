@@ -10,9 +10,12 @@ const tbl_NoticeBoard = new mongoose.Schema({
     userId : {type : String, required : true},
     title : { type : String, required : true},
     content : { type : String },
-    regDate: { type: Date, default: () => new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }) },
-    updateDate: { type: Date, default: () => new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }) },
+    // regDate: { type: Date, default: () => new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }) },
+    // updateDate: { type: Date, default: () => new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }) },
+    regDate : {type:Date, default: ()=>new Date() },
+    updateDate : {type:Date, default: ()=>new Date() },
     bno : {type : Number}
+
 });
 // tbl_Board.plugin(AutoIncrement, { inc_field : 'bno' } )
 
