@@ -3,7 +3,16 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "build": "pkg ."
+  },
+  "bin": {
+    "app": "./bin/www"
+  },
+  "pkg": {
+    "assets": [
+      "public/**/*"
+    ]
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
@@ -27,7 +36,8 @@
     "redis": "^4.6.8",
     "uuid": "^9.0.0"
   },
-  "Proxy": "http://localhost:8080",
+
+  "Proxy": "https://mevnserver.ovmkas.co.kr",
   "main": "app.js",
   "keywords": [],
   "author": "",

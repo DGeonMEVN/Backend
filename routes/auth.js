@@ -72,10 +72,12 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
                 const accessToken = `Bearer ` + jwt.sign(user, req.body.rememberMeCheck);
                 const refreshToken = jwt.refresh(req.body.rememberMeCheck);
                 const userId = user.userId;
+                const authority = user.authority;
+                //rememberMe를 체크 했을때 redis의 시간 설정
                 if(!req.body.rememberMeCheck) {
                     // 발급한 refresh token을 redis에 key를 user의 id로 하여 저장합니다.
                     redisClient.set(user.userId, refreshToken);
-                    redisClient.expire(user.userId, 600); //Token 유효기간60*60*24*7
+                    redisClient.expire(user.userId, 3600); //Token 유효기간60*60*24*7
                 }else{
                     redisClient.set(user.userId, refreshToken);
                 }
@@ -86,6 +88,7 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
                         accessToken,
                         refreshToken,
                         userId,
+                        authority,
                     },
                 });
             } else {
@@ -119,7 +122,7 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
  * @description logout으로 로그인이 된(isLoggedIn) 상태에서만 접근이 가능하다
  */
 router.post('/logout', (req, res) => {
-    console.log("로그아웃 호출")
+    // console.log("로그아웃 호출")
     //세션일때 동작
     // req.logout((err) => {
     //     if(err)  {

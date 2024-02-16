@@ -1,6 +1,9 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
-
+const DiaryBoard = require('../models/diaryBoard');
+const BloodPressure = require('../models/diaryBloodPressure');
+const Takit = require('../models/diaryTake');
+const Gargle = require('../models/diaryGargle');
 /**
  * @author ovmkas
  * @data 2023-10-27
@@ -112,13 +115,23 @@ const passwordCheck = async (req,res)=>{
  */
 const deleteUser = async(req, res) =>{
     try {
-        const user = await User.findOne({userId: req.body.userId});
+        const userId = req.body.userId;
+        const user = await User.findOne({userId:userId});
         if (user && bcrypt.compareSync(req.body.userPw, user.userPw)) {
-            await User.deleteOne({userId : req.body.userId});
+            await User.deleteOne({userId : userId});
+            if(BloodPressure.findOne({userId: userId})) {
+                await BloodPressure.deleteMany({userId: userId});
+            }
+            if(Gargle.findOne({userId : userId})) {
+                await Gargle.deleteMany({userId: userId});
+            }
+            if(Takit.findOne({userId: userId})) {
+                await Takit.deleteMany({userId: userId});
+            }
             res.status(200).send({
                 ok:true,
                 passCheck : true,
-                message : "회원이 맞습니다",
+                message : "회원이 맞습니다. 회원과 정보를 삭제했습니다.",
             })
         }else{
             res.status(200).send({

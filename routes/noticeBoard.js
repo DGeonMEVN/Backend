@@ -210,7 +210,7 @@ router.post("/search", async (req, res, next) => {
     try {
         // console.log("search 넘어온 데이터 " , req.body);
         let pageNum = req.body.pageNum || 1;
-        let pageSize = 3;
+        let pageSize = 10;
         let mongoSkip = (pageNum - 1) * pageSize;
 
         let keyword = req.body.search;

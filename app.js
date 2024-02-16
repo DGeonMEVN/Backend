@@ -7,7 +7,7 @@ const cors = require('cors'); // cors 미들웨어를 사용하여 CORS(Cross-Or
 const passport = require('passport'); // passport 라이브러리를 사용하여 인증 설정
 const passportConfig = require('./passport'); // passport 설정 파일 로딩
 // const authRouter = require('./routes/auth'); // 인증 라우터
-const port = 8080; //서버포트설정
+const port = 8082; //서버포트설정
 // passport 설정 초기화
 passportConfig();
 app.use(bodyParser.json());
@@ -34,17 +34,18 @@ app.use(passport.initialize());
 // app.use(passport.session());
 
 app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', 'http://localhost:3000'); //http://localhost:3000으로 설정되어 있어, 이 도메인에서 오는 요청만 허용
+    res.header('Access-Control-Allow-Origin', 'https://mevn.ovmkas.co.kr'); //http://localhost:3000으로 설정되어 있어, 이 도메인에서 오는 요청만 허용
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS'); //GET, POST, PUT, DELETE, OPTIONS 메서드가 허용
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     next(); //미들웨어로 제어를 전달
 });
-
 // 라우터 설정
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/noticeBoard', require('./routes/noticeBoard'));
 app.use('/api/diaryBoard', require('./routes/diaryBoard'));
-
+app.get('/', (req, res) => {
+    res.send('express 서버입니다.');
+});
 // 서버 리스닝 및 포트 출력
 app.listen(port, function(){
     console.log("Success Port : " + port)

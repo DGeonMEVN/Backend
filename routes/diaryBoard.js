@@ -260,11 +260,11 @@ router.post("/search", authJWT, async (req, res, next) => {
     try {
 
         let pageNum = parseInt(req.body.pageNum, 10) || 1;
-        let pageSize = 3;
+        let pageSize = 10;
         let mongoSkip = (pageNum - 1) * pageSize;
 
         let keyword = req.body.search;
-        console.log(Number(keyword));
+        // console.log(Number(keyword));
         let query = {};
         const orConditions = [];
         // 검색할 각 필드에 대한 조건을 확인하고 추가합니다.
@@ -277,7 +277,7 @@ router.post("/search", authJWT, async (req, res, next) => {
         if (orConditions.length > 0) {
             query.$or = orConditions;
         }
-        console.log("query", query);
+        // console.log("query", query);
 
 
         let diaryBoardList = await DiaryBoard.aggregate([
